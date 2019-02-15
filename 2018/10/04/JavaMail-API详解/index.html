@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="JavaMail API详解cleverpig 发表于 2006-01-01 14:34:28作者:cleverpig     来源:Matrix 摘要:JavaMail API是读取、撰写、发送电子信息的可选包。我们可用它来建立如Eudora、Foxmail、MS Outlook Express一般的邮件用户代理程序（Mail User Agent,简称MUA）。让我们看看JavaMail AP">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaMail API详解">
+<meta property="og:url" content="http://yoursite.com/2018/10/04/JavaMail-API详解/index.html">
+<meta property="og:site_name" content="loyal的博客">
+<meta property="og:description" content="JavaMail API详解cleverpig 发表于 2006-01-01 14:34:28作者:cleverpig     来源:Matrix 摘要:JavaMail API是读取、撰写、发送电子信息的可选包。我们可用它来建立如Eudora、Foxmail、MS Outlook Express一般的邮件用户代理程序（Mail User Agent,简称MUA）。让我们看看JavaMail AP">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-10-04T06:48:42.527Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaMail API详解">
+<meta name="twitter:description" content="JavaMail API详解cleverpig 发表于 2006-01-01 14:34:28作者:cleverpig     来源:Matrix 摘要:JavaMail API是读取、撰写、发送电子信息的可选包。我们可用它来建立如Eudora、Foxmail、MS Outlook Express一般的邮件用户代理程序（Mail User Agent,简称MUA）。让我们看看JavaMail AP">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/04/JavaMail-API详解/">
+
+
+
+
+
+  <title>JavaMail API详解 | loyal的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">loyal的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/04/JavaMail-API详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="loyal">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="loyal的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JavaMail API详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-04T11:15:46+08:00">
+                2018-10-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>JavaMail API详解<br>cleverpig 发表于 2006-01-01 14:34:28<br>作者:cleverpig     来源:Matrix</p>
+<p>摘要:<br>JavaMail API是读取、撰写、发送电子信息的可选包。我们可用它来建立如Eudora、Foxmail、MS Outlook Express一般的邮件用户代理程序（Mail User Agent,简称MUA）。让我们看看JavaMail API是如何提供信息访问功能的吧！JavaMail API被设计用于以不依赖协议的方式去发送和接收电子信息，文中着重：如何以不依赖于协议的方式发送接收电子信息，这也是本文所要描述的.</p>
+<h3 id="一、JavaMail-API简介"><a href="#一、JavaMail-API简介" class="headerlink" title="一、JavaMail API简介"></a>一、JavaMail API简介</h3><p>​    JavaMail API是读取、撰写、发送电子信息的可选包。我们可用它来建立如Eudora、Foxmail、MS Outlook Express一般的邮件用户代理程序（Mail User Agent,简称MUA）。而不是像sendmail或者其它的邮件传输代理（Mail Transfer Agent，简称MTA）程序那样可以传送、递送、转发邮件。从另外一个角度来看，我们这些电子邮件用户日常用MUA程序来读写邮件，而MUA依赖着 MTA处理邮件的递送。</p>
+<p>​    在清楚了到MUA与MTA之间的关系后，让我们看看JavaMail API是如何提供信息访问功能的吧！JavaMail API被设计用于以不依赖协议的方式去发送和接收电子信息，这个API被分为两大部分：基本功能：如何以不依赖于协议的方式发送接收电子信息，这也是本文所要描述的，不过在下文中，大家将看到这只是一厢情愿而已。第二个部分则是依赖特定协议的，比如SMTP、POP、IMAP、NNTP协议。在这部分的JavaMail API是为了和服务器通讯，并不在本文的内容中。</p>
+<h3 id="二、相关协议一览"><a href="#二、相关协议一览" class="headerlink" title="二、相关协议一览"></a>二、相关协议一览</h3><p>​    在我们步入JavaMail API之前，先看一下API所涉及的协议。以下便是大家日常所知、所乐于使用的4大信息传输协议：<br>SMTP<br>POP<br>IMAP<br>MIME</p>
+<p>​    当然，上面的4个协议，并不是全部，还有NNTP和其它一些协议可用于传输信息，但是由于不常用到，所以本文便不提及了。理解这4个基本的协议有助于我们更 好的使用JavaMail API。然而JavaMail API是被设计为与协议无关的，目前我们并不能克服这些协议的束缚。确切的说，如果我们使用的功能并不被我们选择的协议支持，那么JavaMail API并不可能如魔术师一样神奇的赋予我们这种能力。</p>
+<h4 id="1．SMTP"><a href="#1．SMTP" class="headerlink" title="1．SMTP"></a>1．SMTP</h4><p>​    简单邮件传输协议定义了递送邮件的机制。在下文中，我们将使用基于Java-Mail的程序与公司或者ISP的SMTP服务器进行通讯。这个SMTP服务器 将邮件转发到接收者的SMTP服务器，直至最后被接收者通过POP或者IMAP协议获取。这并不需要SMTP服务器使用支持授权的邮件转发，但是却的确要 注意SMTP服务器的正确设置（SMTP服务器的设置与JavaMail API无关）。</p>
+<h4 id="2．POP"><a href="#2．POP" class="headerlink" title="2．POP"></a>2．POP</h4><p>​    POP 是一种邮局协议，目前为第3个版本，即众所周知的POP3。POP定义了一种用户如何获得邮件的机制。它规定了每个用户使用一个单独的邮箱。大多数人在使 用POP时所熟悉的功能并非都被支持，例如查看邮箱中的新邮件数量。而这个功能是微软的Outlook内建的，那么就说明微软Outlook之类的邮件客 户端软件是通过查询最近收到的邮件来计算新邮件的数量来实现前面所说的功能。因此在我们使用JavaMail API时需要注意，当需要获得如前面所讲的新邮件数量之类的信息时，我们不得不自己进行计算。</p>
+<h4 id="3．IMAP"><a href="#3．IMAP" class="headerlink" title="3．IMAP"></a>3．IMAP</h4><p>​    IMAP 使用在接收信息的高级协议，目前版本为第4版，所以也被称为IMAP4。需要注意的是在使用IMAP时，邮件服务器必须支持该协议。从这个方面讲，我们并 不能完全使用IMAP来替代POP，不能期待IMAP在任何地方都被支持。假如邮件服务器支持IMAP，那么我们的邮件程序将能够具有以下被IMAP所支 持的特性：每个用户在服务器上可具有多个目录，这些目录能在多个用户之间共享。</p>
+<p>​    其与POP相比高级之处显而易见，但是在尝试采取IMAP时，我们 认识到它并不是十分完美的：由于IMAP需要从其它服务器上接收新信息，将这些信息递送给用户，维护每个用户的多个目录，这都为邮件服务器带来了高负载。 并且IMAP与POP的一个不同之处是POP用户在接收邮件时将从邮件服务器上下载邮件，而IMAP允许用户直接访问邮件目录，所以在邮件服务器进行备份 作业时，由于每个长期使用此邮件系统的用户所用的邮件目录会占有很大的空间，这将直接导致邮件服务器上磁盘空间暴涨。</p>
+<h4 id="4．MIME"><a href="#4．MIME" class="headerlink" title="4．MIME"></a>4．MIME</h4><p>​    MIME 并不是用于传送邮件的协议，它作为多用途邮件的扩展定义了邮件内容的格式：信息格式、附件格式等等。一些RFC标准都涉及了MIME：RFC 822, RFC 2045, RFC 2046, RFC 2047，有兴趣的Matrixer可以阅读一下。而作为JavaMail API的开发者，我们并不需关心这些格式定义，但是这些格式被用在了程序中。</p>
+<h4 id="5．NNTP和其它的第三方协议"><a href="#5．NNTP和其它的第三方协议" class="headerlink" title="5．NNTP和其它的第三方协议"></a>5．NNTP和其它的第三方协议</h4><p>​    正因为JavaMail API在设计时考虑到与第三方协议实现提供商之间的分离，故我们可以很容易的添加一些第三方协议。SUN维护着一个第三方协议实现提供商的列表：<a href="http://java.sun.com/products/javamail/Third_Party.html" target="_blank" rel="noopener">http://java.sun.com/products/javamail/Third_Party.html</a>，通过此列表我们可以找到所需要的而又不被SUN提供支持的第三方协议：比如NNTP这个新闻组协议和S/MIME这个安全的MIME协议。</p>
+<h3 id="三、安装"><a href="#三、安装" class="headerlink" title="三、安装"></a>三、安装</h3><h4 id="1．安装JavaMail"><a href="#1．安装JavaMail" class="headerlink" title="1．安装JavaMail"></a>1．安装JavaMail</h4><p>​    为了使用JavaMail API，需要从<a href="http://java.sun.com/products/javamail/downloads/index.html下载文件名格式为javamail-[version].zip的文件（这个文件中包括了JavaMail实现），并将其中的mail.jar文件添加到CLASSPATH中。这个实现提供了对SMTP、IMAP4、POP3的支持。" target="_blank" rel="noopener">http://java.sun.com/products/javamail/downloads/index.html下载文件名格式为javamail-[version].zip的文件（这个文件中包括了JavaMail实现），并将其中的mail.jar文件添加到CLASSPATH中。这个实现提供了对SMTP、IMAP4、POP3的支持。</a><br>注意：在安装JavaMail实现之后，我们将在demo目录中发现许多有趣的简单实例程序。</p>
+<p>​    在安装了JavaMail之后,我们还需要安装JavaBeans Activation Framework，因为这个框架是JavaMail API所需要的。如果我们使用J2EE的话，那么我们并无需单独下载JavaMail，因为它存在于J2EE.jar中，只需将J2EE.jar加入到 CLASSPATH即可。</p>
+<h4 id="2．安装JavaBeans-Activation-Framework"><a href="#2．安装JavaBeans-Activation-Framework" class="headerlink" title="2．安装JavaBeans Activation Framework"></a>2．安装JavaBeans Activation Framework</h4><p>​    从<a href="http://java.sun.com/products/javabeans/glasgow/jaf.html" target="_blank" rel="noopener">http://java.sun.com/products/javabeans/glasgow/jaf.html</a>下 载JavaBeans Activation Framework，并将其添加到CLASSPATH中。此框架增加了对任何数据块的分类、以及对它们的处理的特性。这些特性是JavaMail API需要的。虽然听起来这些特性非常模糊，但是它对于我们的JavaMail API来说只是提供了基本的MIME类型支持。<br>到此为止，我们应当把mail.jar和activation.jar都添加到了CLASSPATH中。</p>
+<p>当然如果从方便的角度讲，直接把这两个Jar文件复制到JRE目录的lib/ext目录中也可以。</p>
+<h3 id="四、初次认识JavaMail-API"><a href="#四、初次认识JavaMail-API" class="headerlink" title="四、初次认识JavaMail API"></a>四、初次认识JavaMail API</h3><h4 id="1．了解我们的JavaMail环境"><a href="#1．了解我们的JavaMail环境" class="headerlink" title="1．了解我们的JavaMail环境"></a>1．了解我们的JavaMail环境</h4><h5 id="A．纵览JavaMail核心类结构"><a href="#A．纵览JavaMail核心类结构" class="headerlink" title="A．纵览JavaMail核心类结构"></a>A．纵览JavaMail核心类结构</h5><p>​    打 开JavaMail.jar文件，我们将发现在javax.mail的包下面存在着一些核心类：Session、Message、Address、 Authenticator、Transport、Store、Folder。而且在javax.mail.internet包中还有一些常用的子类。</p>
+<h5 id="B．Session"><a href="#B．Session" class="headerlink" title="B．Session"></a>B．Session</h5><p>​    Session类定义了基本的邮件会话。就像Http会话那样，我们进行收发邮件的工作都是基于这个会话的。Session对象利用了java.util.Properties对象获得了邮件服务器、用户名、密码信息和整个应用程序都要使用到的共享信息。</p>
+<p>Session类的构造方法是私有的，所以我们可以使用Session类提供的getDefaultInstance()这个静态工厂方法获得一个默认的Session对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Properties props = <span class="keyword">new</span> Properties();</span><br><span class="line"><span class="comment">// fill props with any information</span></span><br><span class="line">Session session = Session.getDefaultInstance(props, <span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
+<p>或者使用getInstance()这个静态工厂方法获得自定义的Session: </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Properties props = <span class="keyword">new</span> Properties();</span><br><span class="line"><span class="comment">// fill props with any information</span></span><br><span class="line">Session session = Session.getInstance(props, <span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
+<p>从上面的两个例子中不难发现，getDefaultInstance()和getInstance()方法的第二个参数都是null，这是因为在上面的例子中并没有使用到邮件授权，下文中将对授权进行详细介绍。</p>
+<p>从很多的实例看，在对mail server进行访问的过程中使用共享的Session是足够的，即使是工作在多个用户邮箱的模式下也不例外。</p>
+<h5 id="C．Message"><a href="#C．Message" class="headerlink" title="C．Message"></a>C．Message</h5><p>当 我们建立了Session对象后，便可以被发送的构造信息体了。在这里SUN提供了Message类型来帮助开发者完成这项工作。由于Message是一 个抽象类，大多数情况下，我们使用javax.mail.internet.MimeMessage这个子类，该类是使用MIME类型、MIME信息头的 邮箱信息。信息头只能使用US-ASCII字符，而非ASCII字符将通过编码转换为ASCII的方式使用。</p>
+<p>为了建立一个MimeMessage对象，我们必须将Session对象作为MimeMessage构造方法的参数传入：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MimeMessage message = <span class="keyword">new</span> MimeMessage(session);</span><br></pre></td></tr></table></figure>
+<p>注意：对于MimeMessage类来讲存在着多种构造方法，比如使用输入流作为参数的构造方法。</p>
+<p>在建立了MimeMessage对象后，我们需要设置它的各个part，对于MimeMessage类来说，这些part就是MimePart接口。最基本的设置信息内容的方法就是通过表示信息内容和米么类型的参数调用setContent()方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">message.setContent(<span class="string">"Hello"</span>, <span class="string">"text/plain"</span>);</span><br></pre></td></tr></table></figure>
+<p>然而，如果我们所使用的MimeMessage中信息内容是文本的话，我们便可以直接使用setText()方法来方便的设置文本内容。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">message.setText(<span class="string">"Hello"</span>);</span><br></pre></td></tr></table></figure>
+<p>前面所讲的两种方法，对于文本信息，后者更为合适。而对于其它的一些信息类型，比如HTML信息，则要使用前者。</p>
+<p>别忘记了，使用setSubject()方法对邮件设置邮件主题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">message.setSubject(<span class="string">"First"</span>);</span><br></pre></td></tr></table></figure>
+<h5 id="D．Address"><a href="#D．Address" class="headerlink" title="D．Address"></a>D．Address</h5><p>到这里，我们已经建立了Session和Message，下面将介绍如何使用邮件地址类：Address。像Message一样，Address类也是一个抽象类，所以我们将使用javax.mail.internet.InternetAddress这个子类。</p>
+<p>通过传入代表邮件地址的字符串，我们可以建立一个邮件地址类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Address address = <span class="keyword">new</span> InternetAddress(<span class="string">"president@whitehouse.gov"</span>);</span><br></pre></td></tr></table></figure>
+<p>如果要在邮件地址后面增加名字的话，可以通过传递两个参数：代表邮件地址和名字的字符串来建立一个具有邮件地址和名字的邮件地址类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Address address = <span class="keyword">new</span> InternetAddress(<span class="string">"president@whitehouse.gov"</span>, <span class="string">"George Bush"</span>);</span><br></pre></td></tr></table></figure>
+<p>本文在这里所讲的邮件地址类是为了设置邮件信息的发信人和收信人而准备的，在建立了邮件地址类后，我们通过message的setFrom()和setReplyTo()两种方法设置邮件的发信人：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">message.setFrom(address);</span><br><span class="line">message.setReplyTo(address);</span><br></pre></td></tr></table></figure>
+<p>若在邮件中存在多个发信人地址，我们可用addForm()方法增加发信人：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Address address[] = ...;</span><br><span class="line">message.addFrom(address);</span><br></pre></td></tr></table></figure>
+<p>为了设置收信人，我们使用addRecipient()方法增加收信人，此方法需要使用Message.RecipientType的常量来区分收信人的类型：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">message.addRecipient(type, address)</span><br></pre></td></tr></table></figure>
+<p>下面是Message.RecipientType的三个常量:</p>
+<p>Message.RecipientType.TO</p>
+<p>Message.RecipientType.CC</p>
+<p>Message.RecipientType.BCC</p>
+<p>因此，如果我们要发送邮件给总统，并发用一个副本给第一夫人的话，下面的方法将被用到：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Address toAddress = <span class="keyword">new</span> InternetAddress(<span class="string">"vice.president@whitehouse.gov"</span>);</span><br><span class="line">Address ccAddress = <span class="keyword">new</span> InternetAddress(<span class="string">"first.lady@whitehouse.gov"</span>);</span><br><span class="line">message.addRecipient(Message.RecipientType.TO, toAddress);</span><br><span class="line">message.addRecipient(Message.RecipientType.CC, ccAddress);</span><br></pre></td></tr></table></figure>
+<p>JavaMail API并没有提供检查邮件地址有效性的机制。当然我们可以自己完成这个功能：验证邮件地址的字符是否按照RFC822规定的格式书写或者通过DNS服务器上的MX记录验证等。</p>
+<h5 id="E．Authenticator"><a href="#E．Authenticator" class="headerlink" title="E．Authenticator"></a>E．Authenticator</h5><p>像java.net 类那样，JavaMail API通过使用授权者类（Authenticator）以用户名、密码的方式访问那些受到保护的资源，在这里“资源”就是指邮件服务器。在 javax.mail包中可以找到这个JavaMail的授权者类（Authenticator）。</p>
+<p>在使用Authenticator这个抽象类 时，我们必须采用继承该抽象类的方式，并且该继承类必须具有返回PasswordAuthentication对象（用于存储认证时要用到的用户名、密 码）getPasswordAuthentication()方法。并且要在Session中进行注册，使Session能够了解在认证时该使用哪个类。</p>
+<p>下面代码片断中的MyAuthenticator就是一个Authenticator的子类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Properties props = <span class="keyword">new</span> Properties();</span><br><span class="line"><span class="comment">// fill props with any information</span></span><br><span class="line">Authenticator auth = <span class="keyword">new</span> MyAuthenticator();</span><br><span class="line">Session session = Session.getDefaultInstance(props, auth);</span><br></pre></td></tr></table></figure>
+<h5 id="F．Transport"><a href="#F．Transport" class="headerlink" title="F．Transport"></a>F．Transport</h5><p>在发送信息时，Transport类将被用到。这个类实现了发送信息的协议（通称为SMTP），此类是一个抽象类，我们可以使用这个类的静态方法send()来发送消息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Transport.send(message);</span><br></pre></td></tr></table></figure>
+<p>当然，方法是多样的。我们也可由Session获得相应协议对应的Transport实例。并通过传递用户名、密码、邮件服务器主机名等参数建立与邮件服务器的连接，并使用sendMessage()方法将信息发送，最后关闭连接：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">message.saveChanges(); <span class="comment">// implicit with send()</span></span><br><span class="line">Transport transport = session.getTransport(<span class="string">"smtp"</span>);</span><br><span class="line">transport.connect(host, username, password);</span><br><span class="line">transport.sendMessage(message, message.getAllRecipients());</span><br><span class="line">transport.close();</span><br></pre></td></tr></table></figure>
+<p>评 论：上面的方法是一个很好的方法，尤其是在我们在同一个邮件服务器上发送多个邮件时。因为这时我们将在连接邮件服务器后连续发送邮件，然后再关闭掉连接。 send()这个基本的方法是在每次调用时进行与邮件服务器的连接的，对于在同一个邮件服务器上发送多个邮件来讲可谓低效的方式。</p>
+<p>注意：如果需要在发送邮件过程中监控mail命令的话，可以在发送前设置debug标志：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">session.setDebug(<span class="keyword">true</span>)。</span><br></pre></td></tr></table></figure>
+<h5 id="G．Store和Folder"><a href="#G．Store和Folder" class="headerlink" title="G．Store和Folder"></a>G．Store和Folder</h5><p>接 收邮件和发送邮件很类似都要用到Session。但是在获得Session后，我们需要从Session中获取特定类型的Store，然后连接到 Store，这里的Store代表了存储邮件的邮件服务器。在连接Store的过程中，极有可能需要用到用户名、密码或者Authenticator。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Store store = session.getStore("imap");</span></span><br><span class="line">Store store = session.getStore(<span class="string">"pop3"</span>);</span><br><span class="line">store.connect(host, username, password);</span><br></pre></td></tr></table></figure>
+<p>在连接到Store后，一个Folder对象即目录对象将通过Store的getFolder()方法被返回，我们可从这个Folder中读取邮件信息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Folder folder = store.getFolder(<span class="string">"INBOX"</span>);</span><br><span class="line">folder.open(Folder.READ_ONLY);</span><br><span class="line">Message message[] = folder.getMessages();</span><br></pre></td></tr></table></figure>
+<p>上 面的例子首先从Store中获得INBOX这个Folder（对于POP3协议只有一个名为INBOX的Folder有效），然后以只读 （Folder.READ_ONLY）的方式打开Folder，最后调用Folder的getMessages()方法得到目录中所有Message的数 组。</p>
+<p>注意：对于POP3协议只有一个名为INBOX的Folder有效，而对于IMAP协议，我们可以访问多个Folder（想想前面讲 的IMAP协议）。而且SUN在设计Folder的getMessages()方法时采取了很智能的方式：首先接收新邮件列表，然后再需要的时候（比如读 取邮件内容）才从邮件服务器读取邮件内容。</p>
+<p>在读取邮件时，我们可以用Message类的getContent()方法接收邮件或是writeTo()方法将邮件保存，getContent()方法只接收邮件内容（不包含邮件头），而writeTo()方法将包括邮件头。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.out.println(((MimeMessage)message).getContent());</span><br></pre></td></tr></table></figure>
+<p>在读取邮件内容后，别忘记了关闭Folder和Store。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">folder.close(aBoolean);</span><br><span class="line">store.close();</span><br></pre></td></tr></table></figure>
+<p>传递给Folder.close()方法的boolean 类型参数表示是否在删除操作邮件后更新Folder。 </p>
+<h5 id="H．继续向前进！"><a href="#H．继续向前进！" class="headerlink" title="H．继续向前进！"></a>H．继续向前进！</h5><p>在讲解了以上的七个Java Mail核心类定义和理解了简单的代码片断后，下文将详细讲解怎样使用这些类实现JavaMail API所要完成的高级功能。</p>
+<h3 id="五、使用JavaMail-API"><a href="#五、使用JavaMail-API" class="headerlink" title="五、使用JavaMail API"></a>五、使用JavaMail API</h3><p>在明确了JavaMail API的核心部分如何工作后，本人将带领大家学习一些使用Java Mail API任务案例。</p>
+<h4 id="1．发送邮件"><a href="#1．发送邮件" class="headerlink" title="1．发送邮件"></a>1．发送邮件</h4><p>​    在获得了Session后，建立并填入邮件信息，然后发送它到邮件服务器。这便是使用Java Mail API发送邮件的过程，在发送邮件之前，我们需要设置SMTP服务器：通过设置Properties的mail.smtp.host属性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">String host = ...;</span><br><span class="line">String from = ...;</span><br><span class="line">String to = ...;</span><br><span class="line"><span class="comment">// Get system properties</span></span><br><span class="line">Properties props = System.getProperties();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Setup mail server</span></span><br><span class="line">props.put(<span class="string">"mail.smtp.host"</span>, host);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get session</span></span><br><span class="line">Session session = Session.getDefaultInstance(props, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define message</span></span><br><span class="line">MimeMessage message = <span class="keyword">new</span> MimeMessage(session);</span><br><span class="line">message.setFrom(<span class="keyword">new</span> InternetAddress(from));</span><br><span class="line">message.addRecipient(Message.RecipientType.TO,</span><br><span class="line">	<span class="keyword">new</span> InternetAddress(to));</span><br><span class="line">message.setSubject(<span class="string">"Hello JavaMail"</span>);</span><br><span class="line">message.setText(<span class="string">"Welcome to JavaMail"</span>);</span><br><span class="line"><span class="comment">// Send message</span></span><br><span class="line">Transport.send(message);</span><br></pre></td></tr></table></figure>
+<p>由于建立邮件信息和发送邮件的过程中可能会抛出异常，所以我们需要将上面的代码放入到try-catch结构块中。</p>
+<h4 id="2．接收邮件"><a href="#2．接收邮件" class="headerlink" title="2．接收邮件"></a>2．接收邮件</h4><p>为了在读取邮件，我们获得了session，并且连接到了邮箱的相应store，打开相应的Folder，然后得到我们想要的邮件，当然别忘记了在结束时关闭连接。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">String host = ...;</span><br><span class="line">String username  = ...;</span><br><span class="line">String password  = ...;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get system properties</span></span><br><span class="line">Properties props = System.getProperties();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get session</span></span><br><span class="line">Session session = Session.getDefaultInstance(props, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get the store</span></span><br><span class="line">Store store = session.getStore(<span class="string">"pop3"</span>);</span><br><span class="line">store.connect(host, username, password);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get folder</span></span><br><span class="line">Folder folder = store.getFolder(<span class="string">"INBOX"</span>);</span><br><span class="line">folder.open(Folder.READ_ONLY);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get directory</span></span><br><span class="line">Message message[] = folder.getMessages();</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>, n=message.length; i&lt;n; i++) &#123;</span><br><span class="line">   System.out.println(i + <span class="string">": "</span> + message[i].getFrom()[<span class="number">0</span>] </span><br><span class="line">     + <span class="string">"/t"</span> + message[i].getSubject());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Close connection </span></span><br><span class="line">folder.close(<span class="keyword">false</span>);</span><br><span class="line">store.close();</span><br></pre></td></tr></table></figure>
+<p>​    上面的代码所作的是从邮箱中读取每个邮件，并且显示邮件的发信人地址和主题。从技术角度讲，这里存在着一个异常的可能：当发信人地址为空时，getFrom()[0]将抛出异常。</p>
+<p>​    下面的代码片断有效的说明了如何读取邮件内容，在显示每个邮件发信人和主题后，将出现用户提示从而得到用户是否读取该邮件的确认，如果输入YES的话，我们 可用Message.writeTo(java.io.OutputStream os)方法将邮件内容输出到控制台上，关于Message.writeTo()的具体用法请看JavaMail API。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">BufferedReader reader = <span class="keyword">new</span> BufferedReader (</span><br><span class="line">  <span class="keyword">new</span> InputStreamReader(System.in));</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get directory</span></span><br><span class="line">Message message[] = folder.getMessages();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>, n=message.length; i&lt;n; i++) &#123;</span><br><span class="line">  System.out.println(i + <span class="string">": "</span> + message[i].getFrom()[<span class="number">0</span>] </span><br><span class="line">                       + <span class="string">"/t"</span> + message[i].getSubject());</span><br><span class="line">     System.out.println(<span class="string">"Do you want to read message? "</span> +</span><br><span class="line">                        <span class="string">"[YES to read/QUIT to end]"</span>);</span><br><span class="line">     String line = reader.readLine();</span><br><span class="line">  	 <span class="keyword">if</span> (<span class="string">"YES"</span>.equals(line)) &#123;</span><br><span class="line">     	message[i].writeTo(System.out);</span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"QUIT"</span>.equals(line)) &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">     &#125;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3．删除邮件和标志"><a href="#3．删除邮件和标志" class="headerlink" title="3．删除邮件和标志"></a>3．删除邮件和标志</h4><p>设置与message相关的Flags是删除邮件的常用方法。这些Flags表示了一些系统定义和用户定义的不同状态。在Flags类的内部类Flag中预定义了一些标志：</p>
+<p>Flags.Flag.ANSWERED<br>Flags.Flag.DELETED<br>Flags.Flag.DRAFT<br>Flags.Flag.FLAGGED<br>Flags.Flag.RECENT<br>Flags.Flag.SEEN<br>Flags.Flag.USER</p>
+<p>​    但需要在使用时注意的：标志存在并非意味着这个标志被所有的邮件服务器所支持。例如，对于删除邮件的操作，POP协议不支持上面的任何一个。所以要确定哪些 标志是被支持的——通过访问一个已经打开的Folder对象的getPermanetFlags()方法，它将返回当前被支持的Flags类对象。删除邮件时，我们可以设置邮件的DELETED标志：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">message.setFlag(Flags.Flag.DELETED, <span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
+<p>但是首先要采用READ_WRITE的方式打开Folder：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>在对邮件进行删除操作后关闭Folder时，需要传递一个true作为对删除邮件的擦除确认。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>Folder类中另一种用于删除邮件的方法expunge()也同样可删除邮件，但是它并不为sun提供的POP3实现支持，而其它第三方提供的POP3实现支持或者并不支持这种方法。</p>
+<p>另外，介绍一种检查某个标志是否被设置的方法：Message.isSet(Flags.Flag flag)方法，其中参数为被检查的标志。</p>
+<h4 id="4．邮件认证"><a href="#4．邮件认证" class="headerlink" title="4．邮件认证"></a>4．邮件认证</h4><p>​    我们在前面已经学会了如何使用Authenticator类来代替直接使用用户名和密码这两字符串作为 Session.getDefaultInstance()或者Session.getInstance()方法的参数。在前面的小试牛刀后，现在我们将 了解到全面认识一下邮件认证。</p>
+<p>​    我们在此取代了直接使用邮件服务器主机名、用户名、密码这三个字符串作为连接到POP3 Store的方式，使用存储了邮件服务器主机名信息的属性文件，并在获得Session时传入自定义的Authenticator实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Setup properties</span></span><br><span class="line">Properties props = System.getProperties();</span><br><span class="line">props.put(<span class="string">"mail.pop3.host"</span>, host);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Setup authentication, get session</span></span><br><span class="line">Authenticator auth = <span class="keyword">new</span> PopupAuthenticator();</span><br><span class="line">Session session = Session.getDefaultInstance(props, auth);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Get the store</span></span><br><span class="line">Store store = session.getStore(<span class="string">"pop3"</span>);</span><br><span class="line">store.connect();</span><br></pre></td></tr></table></figure>
+<p>PopupAuthenticator 类继承了抽象类Authenticator，并且通过重载Authenticator类的getPasswordAuthentication()方法返 回PasswordAuthentication类对象。而getPasswordAuthentication()方法的参数param是以逗号分割的 用户名、密码组成的字符串。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javax.mail.*;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PopupAuthenticator</span> <span class="keyword">extends</span> <span class="title">Authenticator</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"> <span class="function"><span class="keyword">public</span> PasswordAuthentication <span class="title">getPasswordAuthentication</span><span class="params">(String param)</span> </span>&#123;</span><br><span class="line">    String username, password;</span><br><span class="line">        </span><br><span class="line">    StringTokenizer st = <span class="keyword">new</span> StringTokenizer(param, <span class="string">","</span>);</span><br><span class="line">    username = st.nextToken();</span><br><span class="line">    password = st.nextToken();   </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> PasswordAuthentication(username, password);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="5．回复邮件"><a href="#5．回复邮件" class="headerlink" title="5．回复邮件"></a>5．回复邮件</h4><p>​    回复邮件的方法很简单：使用Message类的reply()方法，通过配置回复邮件的收件人地址和主题（如果没有提供主题的话，系统将默认将“Re：”作 为邮件的主体），这里不需要设置任何的邮件内容，只要复制发信人或者reply-to到新的收件人。而reply()方法中的boolean参数表示是否 将邮件回复给发送者（参数值为false），或是恢复给所有人（参数值为true）。</p>
+<p>补充一下，reply-to地址需要在发信时使用setReplyTo()方法设置。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MimeMessage reply = (MimeMessage)message.reply(<span class="keyword">false</span>);</span><br><span class="line">reply.setFrom(<span class="keyword">new</span> InternetAddress(<span class="string">"president@whitehouse.gov"</span>));</span><br><span class="line">reply.setText(<span class="string">"Thanks"</span>);</span><br><span class="line">Transport.send(reply);</span><br></pre></td></tr></table></figure>
+<h4 id="6．转发邮件"><a href="#6．转发邮件" class="headerlink" title="6．转发邮件"></a>6．转发邮件</h4><p>​    转发邮件的过程不如前面的回复邮件那样简单，它将建立一个转发邮件，这并非一个方法就能做到。每 个邮件是由多个部分组成，每个部分称为一个邮件体部分，是一个BodyPart类对象，对于MIME类型邮件来讲就是MimeBodyPart类对象。这 些邮件体包含在成为Multipart的容器中对于MIME类型邮件来讲就是MimeMultiPart类对象。在转发邮件时，我们建立一个文字邮件体部 分和一个被转发的文字邮件体部分，然后将这两个邮件体放到一个Multipart中。说明一下，复制一个邮件内容到另一个邮件的方法是仅复制它的 DataHandler（数据处理者）即可。这是由JavaBeans Activation Framework定义的一个类，它提供了对邮件内容的操作命令的访问、管理了邮件内容操作，是不同的数据源和数据格式之间的一致性接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create the message to forward</span></span><br><span class="line">Message forward = <span class="keyword">new</span> MimeMessage(session);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Fill in header</span></span><br><span class="line">forward.setSubject(<span class="string">"Fwd: "</span> + message.getSubject());</span><br><span class="line">forward.setFrom(<span class="keyword">new</span> InternetAddress(from));</span><br><span class="line">forward.addRecipient(Message.RecipientType.TO, </span><br><span class="line">  <span class="keyword">new</span> InternetAddress(to));</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create your new message part</span></span><br><span class="line">BodyPart messageBodyPart = <span class="keyword">new</span> MimeBodyPart();</span><br><span class="line">messageBodyPart.setText(</span><br><span class="line">  <span class="string">"Here you go with the original message:/n/n"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a multi-part to combine the parts</span></span><br><span class="line">Multipart multipart = <span class="keyword">new</span> MimeMultipart();</span><br><span class="line">multipart.addBodyPart(messageBodyPart);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create and fill part for the forwarded content</span></span><br><span class="line">messageBodyPart = <span class="keyword">new</span> MimeBodyPart();</span><br><span class="line">messageBodyPart.setDataHandler(message.getDataHandler());</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add part to multi part</span></span><br><span class="line">multipart.addBodyPart(messageBodyPart);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Associate multi-part with message</span></span><br><span class="line">forward.setContent(multipart);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Send message</span></span><br><span class="line">Transport.send(forward);</span><br></pre></td></tr></table></figure>
+<h4 id="7．使用附件"><a href="#7．使用附件" class="headerlink" title="7．使用附件"></a>7．使用附件</h4><p>附件作为与邮件相关的资源经常以文本、表格、图片等格式出现，如流行的邮件客户端一样，我们可以用JavaMail API从邮件中获取附件或是发送带有附件的邮件。</p>
+<h5 id="A．发送带有附件的邮件"><a href="#A．发送带有附件的邮件" class="headerlink" title="A．发送带有附件的邮件"></a>A．发送带有附件的邮件</h5><p>发送带有附件的邮件的过程有些类似转发邮件，我们需要建立一个完整邮件的各个邮件体部分，在第一个部分（即我们的邮件内容文字）后，增加一个具有DataHandler的附件而不是在转发邮件时那样复制第一个部分的DataHandler。</p>
+<p>如果我们将文件作为附件发送，那么要建立FileDataSource类型的对象作为附件数据源；如果从URL读取数据作为附件发送，那么将要建立URLDataSource类型的对象作为附件数据源。</p>
+<p>然后将这个数据源（FileDataSource或是URLDataSource）对象作为DataHandler类构造方法的参数传入，从而建立一个DataHandler对象作为数据源的DataHandler。</p>
+<p>接着将这个DataHandler设置为邮件体部分的DataHandler。这样就完成了邮件体与附件之间的关联工作，下面的工作就是BodyPart的setFileName()方法设置附件名为原文件名。</p>
+<p>最后将两个邮件体放入到Multipart中，设置邮件内容为这个容器Multipart，发送邮件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"> Define message</span><br><span class="line">Message message = <span class="keyword">new</span> MimeMessage(session);</span><br><span class="line">message.setFrom(<span class="keyword">new</span> InternetAddress(from));</span><br><span class="line">message.addRecipient(Message.RecipientType.TO, </span><br><span class="line">  <span class="keyword">new</span> InternetAddress(to));</span><br><span class="line">message.setSubject(<span class="string">"Hello JavaMail Attachment"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create the message part </span></span><br><span class="line">BodyPart messageBodyPart = <span class="keyword">new</span> MimeBodyPart();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Fill the message</span></span><br><span class="line">messageBodyPart.setText(<span class="string">"Pardon Ideas"</span>);</span><br><span class="line"></span><br><span class="line">Multipart multipart = <span class="keyword">new</span> MimeMultipart();</span><br><span class="line">multipart.addBodyPart(messageBodyPart);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Part two is attachment</span></span><br><span class="line">messageBodyPart = <span class="keyword">new</span> MimeBodyPart();</span><br><span class="line">DataSource source = <span class="keyword">new</span> FileDataSource(filename);</span><br><span class="line">messageBodyPart.setDataHandler(<span class="keyword">new</span> DataHandler(source));</span><br><span class="line">messageBodyPart.setFileName(filename);</span><br><span class="line">multipart.addBodyPart(messageBodyPart);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Put parts in message</span></span><br><span class="line">message.setContent(multipart);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Send the message</span></span><br><span class="line">Transport.send(message);</span><br></pre></td></tr></table></figure>
+<p>如果我们使用servlet实现发送带有附件的邮件，则必须上传附件给servlet，这时需要注意提交页面form中对编码类型的设置应为multipart/form-data。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">FORM</span> <span class="attr">ENCTYPE</span>=<span class="string">"multipart/form-data"</span>  <span class="attr">method</span>=<span class="string">post</span> <span class="attr">action</span>=<span class="string">"/myservlet"</span>&gt;</span>   <span class="tag">&lt;<span class="name">INPUT</span> <span class="attr">TYPE</span>=<span class="string">"file"</span> <span class="attr">NAME</span>=<span class="string">"thefile"</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">INPUT</span> <span class="attr">TYPE</span>=<span class="string">"submit"</span> <span class="attr">VALUE</span>=<span class="string">"Upload"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">FORM</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h5 id="B．读取邮件中的附件"><a href="#B．读取邮件中的附件" class="headerlink" title="B．读取邮件中的附件"></a>B．读取邮件中的附件</h5><p>​    读取邮件中的附件的过程要比发送它的过程复杂一点。因为带有附件的邮件是多部分组成的，我们必须处理每一个部分获得邮件的内容和附件。</p>
+<p>​    但是如何辨别邮件信息内容和附件呢？Sun在Part类（BodyPart类实现的接口类）中提供了getDisposition()方法让开发者获得邮件 体部分的部署类型，当该部分是附件时，其返回之将是Part.ATTACHMENT。但附件也可以没有部署类型的方式存在或者部署类型为 Part.INLINE，无论部署类型为Part.ATTACHMENT还是Part.INLINE，我们都能把该邮件体部分导出保存。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Multipart mp = (Multipart)message.getContent();</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>, n=multipart.getCount(); i&lt;n; i++) &#123;</span><br><span class="line">  	 Part part = multipart.getBodyPart(i));</span><br><span class="line">    	</span><br><span class="line">     String disposition = part.getDisposition();</span><br><span class="line">    </span><br><span class="line">       <span class="keyword">if</span> ((disposition != <span class="keyword">null</span>) &amp;&amp; </span><br><span class="line">       ((disposition.equals(Part.ATTACHMENT) || </span><br><span class="line">        (disposition.equals(Part.INLINE))) &#123;</span><br><span class="line">    saveFile(part.getFileName(), part.getInputStream());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下列代码中使用了saveFile方法是自定义的方法，它根据附件的文件名建立一个文件，如果本地磁盘上存在名为附件的文件，那么将在文件名后增加数字表示区别。然后从邮件体中读取数据写入到本地文件中（代码省略）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (disposition == <span class="keyword">null</span>) &#123;</span><br><span class="line">  <span class="comment">// Check if plain</span></span><br><span class="line">  MimeBodyPart mbp = (MimeBodyPart)part;</span><br><span class="line">  <span class="keyword">if</span> (mbp.isMimeType(<span class="string">"text/plain"</span>)) &#123;</span><br><span class="line">    <span class="comment">// Handle plain</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  	<span class="comment">// Special non-attachment cases here of </span></span><br><span class="line">    <span class="comment">// image/gif, text/html, ...</span></span><br><span class="line">  &#125;</span><br><span class="line">...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="8．处理HTML邮件"><a href="#8．处理HTML邮件" class="headerlink" title="8．处理HTML邮件"></a>8．处理HTML邮件</h4><p>前面的例子中发送的邮件都是以文本为内容的（除了附件），下面将介绍如何接收和发送基于HTML的邮件。</p>
+<h5 id="A．发送HTML邮件"><a href="#A．发送HTML邮件" class="headerlink" title="A．发送HTML邮件"></a>A．发送HTML邮件</h5><p>假如我们需要发送一个HTML文件作为邮件内容，并使邮件客户端在读取邮件时获取相关的图片或者文字的话，只要设置邮件内容为html代码，并设置内容类型为text/html即可：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">String</span> htmlText = <span class="string">"&lt;H1&gt;Hello&lt;/H1&gt;"</span> + </span><br><span class="line">  <span class="string">"&lt;img src=/"</span>http:<span class="comment">//www.jguru.com/images/logo.gif/"&gt;";</span></span><br><span class="line">message.setContent(htmlText, <span class="string">"text/html"</span>));</span><br></pre></td></tr></table></figure>
+<p>请注意：这里的图片并不是在邮件中内嵌的，而是在URL中定义的。邮件接收者只有在线时才能看到。</p>
+<p>在接收邮件时，如果我们使用JavaMail API接收邮件的话是无法实现以HTML方式显示邮件内容的。因为JavaMail API邮件内容视为二进制流。所以要显示HTML内容的邮件，我们必须使用JEditorPane或者第三方HTML展现组件。</p>
+<p>以下代码显示了如何使用JEditorPane显示邮件内容：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (message.getContentType().equals(<span class="string">"text/html"</span>)) &#123;</span><br><span class="line">  String content = (String)message.getContent();</span><br><span class="line">  JFrame frame = <span class="keyword">new</span> JFrame();</span><br><span class="line">  JEditorPane text = <span class="keyword">new</span> JEditorPane(<span class="string">"text/html"</span>, content);</span><br><span class="line">  text.setEditable(<span class="keyword">false</span>);</span><br><span class="line">  JScrollPane pane = <span class="keyword">new</span> JScrollPane(text);</span><br><span class="line">  frame.getContentPane().add(pane);</span><br><span class="line">  frame.setSize(<span class="number">300</span>, <span class="number">300</span>);</span><br><span class="line">  frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);</span><br><span class="line">  frame.show();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="B．在邮件中包含图片"><a href="#B．在邮件中包含图片" class="headerlink" title="B．在邮件中包含图片"></a>B．在邮件中包含图片</h5><p>​    如果我们在邮件中使用HTML作为内容，那么最好将HTML中使用的图片作为邮件的一部分，这样无论是否在线都会正确的显示HTML中的图片。处理方法就是 将HTML中用到的图片作为邮件附件并使用特殊的cid URL作为图片的引用，这个cid就是对图片附件的Content-ID头的引用。</p>
+<p>​    处理内嵌图片就像向邮件中添加附件一样，不同之处在于我们必须通过设置图片附件所在的邮件体部分的header中Content-ID为一个随机字符串，并在HTML中img的src标记中设置为该字符串。这样就完成了图片附件与HTML的关联。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">String file = ...;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create the message</span></span><br><span class="line">Message message = <span class="keyword">new</span> MimeMessage(session);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Fill its headers</span></span><br><span class="line">message.setSubject(<span class="string">"Embedded Image"</span>);</span><br><span class="line">message.setFrom(<span class="keyword">new</span> InternetAddress(from));</span><br><span class="line">message.addRecipient(Message.RecipientType.TO, </span><br><span class="line">  <span class="keyword">new</span> InternetAddress(to));</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create your new message part</span></span><br><span class="line">BodyPart messageBodyPart = <span class="keyword">new</span> MimeBodyPart();</span><br><span class="line">String htmlText = <span class="string">"&lt;H1&gt;Hello&lt;/H1&gt;"</span> + </span><br><span class="line">  <span class="string">"&lt;img src=/"</span>cid:memememe/<span class="string">"&gt;"</span>;</span><br><span class="line">messageBodyPart.setContent(htmlText, <span class="string">"text/html"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create a related multi-part to combine the parts</span></span><br><span class="line">MimeMultipart multipart = <span class="keyword">new</span> MimeMultipart(<span class="string">"related"</span>);</span><br><span class="line">multipart.addBodyPart(messageBodyPart);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create part for the image</span></span><br><span class="line">messageBodyPart = <span class="keyword">new</span> MimeBodyPart();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Fetch the image and associate to part</span></span><br><span class="line">DataSource fds = <span class="keyword">new</span> FileDataSource(file);</span><br><span class="line">messageBodyPart.setDataHandler(<span class="keyword">new</span> DataHandler(fds));</span><br><span class="line">messageBodyPart.setHeader(<span class="string">"Content-ID"</span>,<span class="string">"&lt;memememe&gt;"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Add part to multi-part</span></span><br><span class="line">multipart.addBodyPart(messageBodyPart);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Associate multi-part with message</span></span><br><span class="line">message.setContent(multipart);</span><br></pre></td></tr></table></figure>
+<h3 id="9．在邮件中搜索短语"><a href="#9．在邮件中搜索短语" class="headerlink" title="9．在邮件中搜索短语"></a>9．在邮件中搜索短语</h3><p>JavaMail API提供了过滤器机制，它被用来建立搜索短语。这个短语由javax.mail.search包中的SearchTerm抽象类来定义，在定义后我们便可以使用Folder的Search()方法在Folder中查找邮件：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SearchTerm st = ...;</span><br><span class="line">Message[] msgs = folder.search(st);</span><br></pre></td></tr></table></figure>
+<p>下面有22个不同的类（继承了SearchTerm类）供我们使用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">AND <span class="title">terms</span> <span class="params">(class AndTerm)</span></span></span><br><span class="line"><span class="function">OR <span class="title">terms</span> <span class="params">(class OrTerm)</span></span></span><br><span class="line"><span class="function">NOT <span class="title">terms</span> <span class="params">(class NotTerm)</span></span></span><br><span class="line"><span class="function">SENT DATE <span class="title">terms</span> <span class="params">(class SentDateTerm)</span></span></span><br><span class="line"><span class="function">CONTENT <span class="title">terms</span> <span class="params">(class BodyTerm)</span></span></span><br><span class="line"><span class="function">HEADER <span class="title">terms</span> <span class="params">(FromTerm / FromStringTerm, RecipientTerm / RecipientStringTerm, SubjectTerm, etc.)</span></span></span><br></pre></td></tr></table></figure>
+<p>使用这些类定义的断语集合，我们可以构造一个逻辑表达式，并在Folder中进行搜索。下面是一个实例：在Folder中搜索邮件主题含有“ADV”字符串或者发信人地址为<a href="mailto:friend@public.com" target="_blank" rel="noopener">friend@public.com</a>的邮件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SearchTerm st = </span><br><span class="line">  <span class="keyword">new</span> OrTerm(</span><br><span class="line">    <span class="keyword">new</span> SubjectTerm(<span class="string">"ADV:"</span>), </span><br><span class="line">    <span class="keyword">new</span> FromStringTerm(<span class="string">"friend@public.com"</span>));</span><br><span class="line">Message[] msgs = folder.search(st);</span><br></pre></td></tr></table></figure>
+<h3 id="六、参考资源"><a href="#六、参考资源" class="headerlink" title="六、参考资源"></a>六、参考资源</h3><p><a href="http://java.sun.com/products/javamail/index.jsp" target="_blank" rel="noopener">JavaMail API Home</a><br><a href="http://java.sun.com/developer/onlineTraining/JavaMail/contents.html" target="_blank" rel="noopener">Sun’s JavaMail API基础</a><br><a href="http://java.sun.com/products/javabeans/glasgow/jaf.html" target="_blank" rel="noopener">JavaBeans Activation Framework Home</a><br><a href="http://mail.java.sun.com/archives/javamail-interest.html" target="_blank" rel="noopener">javamail-interest mailing list</a><br><a href="http://java.sun.com/products/javamail/FAQ.html" target="_blank" rel="noopener">Sun’s JavaMail FAQ</a><br><a href="http://www.jguru.com/faq/JavaMail" target="_blank" rel="noopener">jGuru’s JavaMail FAQ</a></p>
+<p><a href="http://java.sun.com/products/javamail/Third_Party.html" target="_blank" rel="noopener">Third Party Products List</a></p>
+<h3 id="七、代码下载"><a href="#七、代码下载" class="headerlink" title="七、代码下载"></a>七、代码下载</h3><p><a href="http://java.sun.com/developer/onlineTraining/JavaMail/exercises.html" target="_blank" rel="noopener">http://java.sun.com/developer/onlineTraining/JavaMail/exercises.html</a> </p>
+<hr>
+<h3 id="JavaMail常见问题"><a href="#JavaMail常见问题" class="headerlink" title="JavaMail常见问题"></a><strong>JavaMail常见问题</strong></h3><p><strong>一般问题</strong> </p>
+<p> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#1" target="_blank" rel="noopener">什么是 JavaMail API？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#getJM" target="_blank" rel="noopener">我如何获得 JavaMail API 的实现？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#feedback" target="_blank" rel="noopener">我如何发送反馈或评论？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#JAF" target="_blank" rel="noopener">javax.activation 在哪里？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#JDK" target="_blank" rel="noopener">JavaMail API 需要什么 JDK？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#ossup" target="_blank" rel="noopener">从哪里能找到我喜欢的操作系统的 JavaMail 版本？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#browsers" target="_blank" rel="noopener">JavaMail API 可以在浏览器中工作吗？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#webmail" target="_blank" rel="noopener">我可以使用 JavaMail 来从 Web 邮件账户（比如 Yahoo 或 Hotmail）中阅读邮件吗？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#imap" target="_blank" rel="noopener">什么是 IMAP？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#smtp" target="_blank" rel="noopener">什么是 SMTP？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#mime" target="_blank" rel="noopener">什么是 MIME？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#pop3q" target="_blank" rel="noopener">什么是 POP3？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#otherprovs" target="_blank" rel="noopener">对 MAPI、NNTP、Lotus Notes 和其他服务提供程序的支持怎样？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#localprovs" target="_blank" rel="noopener">我如何在本地磁盘上存储邮件消息？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#sundocs" target="_blank" rel="noopener">我可以从哪里找到有关 Sun 协议提供程序的文档？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#free" target="_blank" rel="noopener">JavaMail API 实现是否完全免费？我可以把它与我的产品一起发行吗？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#source" target="_blank" rel="noopener">我可以获得 JavaMail API 实现的源代码吗？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#y2k" target="_blank" rel="noopener">JavaMail 是否符合 Y2K？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#more" target="_blank" rel="noopener">我的问题不在这里，我应该在哪里查找？</a></p>
+<h5 id="安装和配置"><a href="#安装和配置" class="headerlink" title="安装和配置"></a>安装和配置</h5><p> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#install" target="_blank" rel="noopener">我如何安装 JavaMail API 实现？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#incservers" target="_blank" rel="noopener">JavaMail 是否包括所有必要的邮件服务器？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#servers" target="_blank" rel="noopener">从哪里可以获得必要的邮件服务器？ </a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#whichserver" target="_blank" rel="noopener">我应该使用什么主机名、用户名或密码？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#proxy" target="_blank" rel="noopener">我如何配置 JavaMail 通过代理服务器工作？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#classpath" target="_blank" rel="noopener">如何在 Windows NT 中设置 CLASSPATH？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#linuxzip" target="_blank" rel="noopener">当试图在 Linux 中运行程序时，得到了非常奇怪的错误消息，而且程序运行失败了。错误在哪里？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#securityManager" target="_blank" rel="noopener">在运行于 SecurityManager 下面的应用程序中，我如何使用 JavaMail；我必须授予应用程序和 JavaMail 什么权限？ </a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#servletconfig" target="_blank" rel="noopener">如何配置 Web 服务器来运行 JavaMail 演示 servlet？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#servletcp" target="_blank" rel="noopener">当在 servlet 中使用 JavaMail 时，未找到任何的 JavaMail 类。我已经在服务器的 CLASSPATH 中添加了 mail.jar？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#servletSecurityManager" target="_blank" rel="noopener">我的 servlet 可以找到 JavaMail 类，但 JavaMail 抱怨它不能找到针对“smtp”或“imap”的服务提供程序或地址类型“rfc822”。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#jws.jar" target="_blank" rel="noopener">在哪里可以找到 jws.jar？我已经安装了 Java Web Server 2.0，并试图运行 JavaMailServlet。README 文件指示我在 CLASSPATH 中添加 jws.jar。</a></p>
+<p><strong>编程</strong> </p>
+<p> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#basics" target="_blank" rel="noopener">从哪里可以学习有关 Internet 邮件的基础知识，它是我高效编写 JavaMail 程序需要知道的？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#debug" target="_blank" rel="noopener">如何调试使用 JavaMail API 的应用程序？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#attach" target="_blank" rel="noopener">如何发送带有附件的消息？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#readattach" target="_blank" rel="noopener">如何阅读带有附件的消息并保存附件？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#disco" target="_blank" rel="noopener">什么是“中断支持”（disconnected support）？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#whendisco" target="_blank" rel="noopener">如何使用 JavaMail API 来支持中断操作？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#security" target="_blank" rel="noopener">我如何使用 JavaMail API 来发送安全的电子邮件？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#repres" target="_blank" rel="noopener">writeTo() 方法生成了消息文件，但消息中的一些行既不是数据的规范 MIME 表示（即使用 CRLF 来结束行），又没有使用我的平台的规范行分隔符（例如 UNIX 上的“/n”）。如果我需要这些表示时，如何获得它们当中的任何一种表示？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#javamailserver" target="_blank" rel="noopener">我可以使用 JavaMail API 来实现邮件服务器吗？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#newusers" target="_blank" rel="noopener">我可以使用 JavaMail API 在我的邮件服务器上添加新的用户账户、删除用户账户或改变用户账户的密码吗？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#serialize" target="_blank" rel="noopener">为什么 MimeMessage 类没有实现 Serializable，这样我就可以将消息序列化到磁盘，并在以后读回它？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#myservprov" target="_blank" rel="noopener">我如何编写服务提供程序？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#Exchange-login" target="_blank" rel="noopener">我在登录 Microsoft Exchange 服务器时碰到了麻烦，我确信正在使用的用户名和密码是正确的，我做错了什么？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#encodebinary" target="_blank" rel="noopener">在发送二进制文件前，我如何编码它？当收到它时，我又如何解码它？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#whenencode" target="_blank" rel="noopener">如果我不需要自己编码和解码附件，我应该何时使用 MimeUtility 方法？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#howencode" target="_blank" rel="noopener">尽管 JavaMail 完成了所有的编码和解码工作，但我仍需要手动控制一些主体部分的编码。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#encodefilename" target="_blank" rel="noopener">为什么 JavaMail 没有在非 ASCII 字符集中正确编码和解码文件名？</a></p>
+<h5 id="阅读邮件——IMAP"><a href="#阅读邮件——IMAP" class="headerlink" title="阅读邮件——IMAP"></a>阅读邮件——IMAP</h5><p> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#error" target="_blank" rel="noopener">我尝试在我的 IMAP 服务器上运行演示程序，但我得到了错误。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#fetch" target="_blank" rel="noopener">当我提取带有较大附件的消息时，IMAP 提供程序似乎丢失了数据。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#cache" target="_blank" rel="noopener">IMAP 提供程序是否缓存检索的数据？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#mvmsg" target="_blank" rel="noopener">我想在文件夹间移动消息。我应该使用 appendMessages() 或 copyMessages() 吗？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#lgmsg" target="_blank" rel="noopener">有时检索大消息主体似乎是低效的。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#lgbin" target="_blank" rel="noopener">当加载这种大二进制附件时，我得到了 OutOfMemory 错误。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#getContent" target="_blank" rel="noopener">当在主体部分 (bodypart) 上调用 getContent() 时，我为什么会得到 UnsupportedDataTypeException？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#unsupen" target="_blank" rel="noopener">当在包含文本数据的主体部分 (bodypart) 上调用 getContent() 时，为什么会得到 UnsupportedEncodingException？</a></p>
+<h5 id="发送邮件——SMTP"><a href="#发送邮件——SMTP" class="headerlink" title="发送邮件——SMTP"></a>发送邮件——SMTP</h5><p> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#reply" target="_blank" rel="noopener">我如何回复消息？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#forward" target="_blank" rel="noopener">我如何转发消息？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#sendhtml" target="_blank" rel="noopener">我如何发送 HTML 邮件？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#sendrich" target="_blank" rel="noopener">我如何发送具有不同字体和颜色的格式化文本的邮件？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#sendmpa" target="_blank" rel="noopener">我如何发送具有纯文本和 HTML 文本的邮件，让每个邮件的阅读者可以选择适合它的格式？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#sendmpr" target="_blank" rel="noopener">我如何发送包含图像的 HTML 邮件？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#send" target="_blank" rel="noopener">Transport 方法 send 和 sendMessage 之间有什么区别？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#connectsend" target="_blank" rel="noopener">我需要验证到 SMTP 服务器，因此我调用了 trans.connect(host, user, password)，然后调用 trans.send(msg) 发送消息，但它却不能工作。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#hdrs" target="_blank" rel="noopener">我修改了一条消息，但标题却没有反映修改。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#sendMessage" target="_blank" rel="noopener">我正在使用 sendMessage() 方法发送消息，但在消息中的文本前后却出现奇怪的一些行，并且我的附件也在消息体中出现。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#msgid" target="_blank" rel="noopener">我为新消息的 Message-ID 标题设置了特定值。但当我发送这条消息时，却重写了那个标题。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#unsup" target="_blank" rel="noopener">当发送创建的新消息时，为什么会得到 UnsupportedDataTypeException？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#smtpfrom" target="_blank" rel="noopener">当发送消息时，如何能够显式地设置 SMTP FROM: 属性？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#rptsend" target="_blank" rel="noopener">我想重复发送消息，并且每次发送给一组不同的收件人。但调用 Transport.send(Message) 却导致每次都创建一个新的 Transport 会话。在本例中，这是一个次优办法，我如何来解决它？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#helo" target="_blank" rel="noopener">当试图发送消息时，我得到了 “MessagingException: 501 HELO requires domain address”（MessagingException: 501 HELO 要求域地址）。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#badaddr" target="_blank" rel="noopener">如果将消息发送到错误的地址，为什么我会获得 SendFailedException 或 TransportEvent，指出地址是错误的？ </a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#bounce" target="_blank" rel="noopener">当消息不能被传送时，就会返回一个失败消息。我如何检测这些“回弹”消息？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#legaladdress" target="_blank" rel="noopener">当创建 InternetAddress 对象时，如果地址是非法的，为什么不会获得异常？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#norelay" target="_blank" rel="noopener">当试图发送消息时，我为什么会获得 javax.mail.SendFailedException: 550 Unable to relay for <em>我的地址</em>？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#connectionrefused" target="_blank" rel="noopener">当试图发送消息到（例如）Yahoo时，为什么我会获得一个错误，指出“连接被拒绝”？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#checkpop3first" target="_blank" rel="noopener">当 发送邮件时，为什么会失败，并得到一个异常，异常中包括像“553 To send mail, first check your mail with a valid POP account”（553 为发送邮件，首先检查邮件具有合法的 POP 账户）这样的消息？</a></p>
+<p><strong>POP3</strong> </p>
+<p> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#pop3" target="_blank" rel="noopener">我可以从哪里找到 POP3 的支持？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#delpop3" target="_blank" rel="noopener">我想在 POP3 服务器上删除消息。我在这些消息上设置了 DELETED 标志。然后调用 expunge() 方法，但我得到了MethodNotSupportedException。当使用 Sun 的 POP3 提供程序时，我如何删除消息？ </a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#uilds" target="_blank" rel="noopener">在从 Sun POP3 提供程序获得的消息中，我如何可以检索 POP3 UIDL？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#newmsgs" target="_blank" rel="noopener">对于 POP3，我如何知道哪里消息是新的？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#newmsgs2" target="_blank" rel="noopener">当使用 POP3 时，为什么 hasNewMessages() 总是返回 false？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#newmsgs3" target="_blank" rel="noopener">我创建了 MessageCountListener（如 monitor 程序中所展示的），但在我的 POP3 INBOX（收件箱）中，我从未得到通知。 </a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#rcvdate" target="_blank" rel="noopener">当使用 POP3 时，为什么 getReceivedDate() 返回 null？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#pop3111" target="_blank" rel="noopener">当使用 POP3 时，我得到了有关 SocketFetcher 类的抱怨。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#pop312" target="_blank" rel="noopener">当使用 POP3 时，我得到了有关 contentStream 字段的抱怨。</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#pop3folder" target="_blank" rel="noopener">除了 POP3 服务器上的 INBOX（收件箱）外，您如何访问或创建文件夹？</a></p>
+<p><strong>servlet 中的 JavaMail</strong></p>
+<p><a href="http://www.huihoo.com/java/javamail/javamail_faq.html#servlethow" target="_blank" rel="noopener">我可以在 servlet 中使用 JavaMail 吗？</a></p>
+<p><strong>applet 中的 JavaMail</strong></p>
+<p><a href="http://www.huihoo.com/java/javamail/javamail_faq.html#applets" target="_blank" rel="noopener">我可以在 applet 中使用 JavaMail 吗？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#appletsecurity" target="_blank" rel="noopener">在 applet 中，使用 JavaMail 的安全问题是什么？</a> <a href="http://www.huihoo.com/java/javamail/javamail_faq.html#appletalt" target="_blank" rel="noopener">OK，可能我确实不想使用 applet，那我应该怎么做？</a></p>
+<p>(转载自：<a href="https://blog.csdn.net/imain/article/details/1453677" target="_blank" rel="noopener">https://blog.csdn.net/imain/article/details/1453677</a> )</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/04/三种Tomcat集群方式的优缺点分析/" rel="next" title="三种Tomcat集群方式的优缺点分析">
+                <i class="fa fa-chevron-left"></i> 三种Tomcat集群方式的优缺点分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/04/JSP九大内置对象分析/" rel="prev" title="JSP九大内置对象分析">
+                JSP九大内置对象分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">loyal</p>
+              <p class="site-description motion-element" itemprop="description">苦逼的码农</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、JavaMail-API简介"><span class="nav-number">1.</span> <span class="nav-text">一、JavaMail API简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、相关协议一览"><span class="nav-number">2.</span> <span class="nav-text">二、相关协议一览</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1．SMTP"><span class="nav-number">2.1.</span> <span class="nav-text">1．SMTP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2．POP"><span class="nav-number">2.2.</span> <span class="nav-text">2．POP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3．IMAP"><span class="nav-number">2.3.</span> <span class="nav-text">3．IMAP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4．MIME"><span class="nav-number">2.4.</span> <span class="nav-text">4．MIME</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5．NNTP和其它的第三方协议"><span class="nav-number">2.5.</span> <span class="nav-text">5．NNTP和其它的第三方协议</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、安装"><span class="nav-number">3.</span> <span class="nav-text">三、安装</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1．安装JavaMail"><span class="nav-number">3.1.</span> <span class="nav-text">1．安装JavaMail</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2．安装JavaBeans-Activation-Framework"><span class="nav-number">3.2.</span> <span class="nav-text">2．安装JavaBeans Activation Framework</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、初次认识JavaMail-API"><span class="nav-number">4.</span> <span class="nav-text">四、初次认识JavaMail API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1．了解我们的JavaMail环境"><span class="nav-number">4.1.</span> <span class="nav-text">1．了解我们的JavaMail环境</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#A．纵览JavaMail核心类结构"><span class="nav-number">4.1.1.</span> <span class="nav-text">A．纵览JavaMail核心类结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#B．Session"><span class="nav-number">4.1.2.</span> <span class="nav-text">B．Session</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#C．Message"><span class="nav-number">4.1.3.</span> <span class="nav-text">C．Message</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#D．Address"><span class="nav-number">4.1.4.</span> <span class="nav-text">D．Address</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#E．Authenticator"><span class="nav-number">4.1.5.</span> <span class="nav-text">E．Authenticator</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#F．Transport"><span class="nav-number">4.1.6.</span> <span class="nav-text">F．Transport</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#G．Store和Folder"><span class="nav-number">4.1.7.</span> <span class="nav-text">G．Store和Folder</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#H．继续向前进！"><span class="nav-number">4.1.8.</span> <span class="nav-text">H．继续向前进！</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、使用JavaMail-API"><span class="nav-number">5.</span> <span class="nav-text">五、使用JavaMail API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1．发送邮件"><span class="nav-number">5.1.</span> <span class="nav-text">1．发送邮件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2．接收邮件"><span class="nav-number">5.2.</span> <span class="nav-text">2．接收邮件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3．删除邮件和标志"><span class="nav-number">5.3.</span> <span class="nav-text">3．删除邮件和标志</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4．邮件认证"><span class="nav-number">5.4.</span> <span class="nav-text">4．邮件认证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5．回复邮件"><span class="nav-number">5.5.</span> <span class="nav-text">5．回复邮件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6．转发邮件"><span class="nav-number">5.6.</span> <span class="nav-text">6．转发邮件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7．使用附件"><span class="nav-number">5.7.</span> <span class="nav-text">7．使用附件</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#A．发送带有附件的邮件"><span class="nav-number">5.7.1.</span> <span class="nav-text">A．发送带有附件的邮件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#B．读取邮件中的附件"><span class="nav-number">5.7.2.</span> <span class="nav-text">B．读取邮件中的附件</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8．处理HTML邮件"><span class="nav-number">5.8.</span> <span class="nav-text">8．处理HTML邮件</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#A．发送HTML邮件"><span class="nav-number">5.8.1.</span> <span class="nav-text">A．发送HTML邮件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#B．在邮件中包含图片"><span class="nav-number">5.8.2.</span> <span class="nav-text">B．在邮件中包含图片</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9．在邮件中搜索短语"><span class="nav-number">6.</span> <span class="nav-text">9．在邮件中搜索短语</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六、参考资源"><span class="nav-number">7.</span> <span class="nav-text">六、参考资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#七、代码下载"><span class="nav-number">8.</span> <span class="nav-text">七、代码下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JavaMail常见问题"><span class="nav-number">9.</span> <span class="nav-text">JavaMail常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#安装和配置"><span class="nav-number">9.0.1.</span> <span class="nav-text">安装和配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#阅读邮件——IMAP"><span class="nav-number">9.0.2.</span> <span class="nav-text">阅读邮件——IMAP</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#发送邮件——SMTP"><span class="nav-number">9.0.3.</span> <span class="nav-text">发送邮件——SMTP</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">loyal</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

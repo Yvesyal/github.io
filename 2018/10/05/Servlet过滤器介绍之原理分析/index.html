@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Servlet,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文主要介绍Servlet**过滤器的基本原理 1．Servlet过滤器1.1 什么是过滤器过滤器是一个程序，它先于与之相关的servlet或JSP页面运行在服务器上。过滤器可附加到一个或多个servlet或JSP页面上，并且可以检查进入这些资源的请求信息。在这之后，过滤器可以作如下的选择： ①以常规的方式调用资源（即，调用servlet或JSP页面）。 ②利用修改过的请求信息调用资源。 ③调用资">
+<meta name="keywords" content="Servlet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Servlet过滤器介绍之原理分析">
+<meta property="og:url" content="http://yoursite.com/2018/10/05/Servlet过滤器介绍之原理分析/index.html">
+<meta property="og:site_name" content="loyal的博客">
+<meta property="og:description" content="本文主要介绍Servlet**过滤器的基本原理 1．Servlet过滤器1.1 什么是过滤器过滤器是一个程序，它先于与之相关的servlet或JSP页面运行在服务器上。过滤器可附加到一个或多个servlet或JSP页面上，并且可以检查进入这些资源的请求信息。在这之后，过滤器可以作如下的选择： ①以常规的方式调用资源（即，调用servlet或JSP页面）。 ②利用修改过的请求信息调用资源。 ③调用资">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-10-05T07:04:30.186Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Servlet过滤器介绍之原理分析">
+<meta name="twitter:description" content="本文主要介绍Servlet**过滤器的基本原理 1．Servlet过滤器1.1 什么是过滤器过滤器是一个程序，它先于与之相关的servlet或JSP页面运行在服务器上。过滤器可附加到一个或多个servlet或JSP页面上，并且可以检查进入这些资源的请求信息。在这之后，过滤器可以作如下的选择： ①以常规的方式调用资源（即，调用servlet或JSP页面）。 ②利用修改过的请求信息调用资源。 ③调用资">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/05/Servlet过滤器介绍之原理分析/">
+
+
+
+
+
+  <title>Servlet过滤器介绍之原理分析 | loyal的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">loyal的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/05/Servlet过滤器介绍之原理分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="loyal">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="loyal的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Servlet过滤器介绍之原理分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-05T13:44:28+08:00">
+                2018-10-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Servlet/" itemprop="url" rel="index">
+                    <span itemprop="name">Servlet</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><em>本文主要介绍Servlet**过滤器的基本原理</em></p>
+<h3 id="1．Servlet过滤器"><a href="#1．Servlet过滤器" class="headerlink" title="1．Servlet过滤器"></a>1．Servlet过滤器</h3><h4 id="1-1-什么是过滤器"><a href="#1-1-什么是过滤器" class="headerlink" title="1.1 什么是过滤器"></a>1.1 什么是过滤器</h4><p>过滤器是一个程序，它先于与之相关的servlet或JSP页面运行在服务器上。过滤器可附加到一个或多个servlet或JSP页面上，并且可以检查进入这些资源的请求信息。在这之后，过滤器可以作如下的选择：</p>
+<p>①以常规的方式调用资源（即，调用servlet或JSP页面）。</p>
+<p>②利用修改过的请求信息调用资源。</p>
+<p>③调用资源，但在发送响应到客户机前对其进行修改。</p>
+<p>④阻止该资源调用，代之以转到其他的资源，返回一个特定的状态代码或生成替换输出。</p>
+<h4 id="1-2-Servlet过滤器的基本原理"><a href="#1-2-Servlet过滤器的基本原理" class="headerlink" title="1.2 Servlet过滤器的基本原理"></a>1.2 Servlet过滤器的基本原理</h4><p>在Servlet作为过滤器使用时，它可以对客户的请求进行处理。处理完成后，它会交给下一个过滤器处理，这样，客户的请求在过滤链里逐个处理，直到请求发送到目标为止。例如，某网站里有提交“修改的注册信息”的网页，当用户填写完修改信息并提交后，服务器在进行处理时需要做两项工作：判断客户端的会话是否有效；对提交的数据进行统一编码。这两项工作可以在由两个过滤器组成的过滤链里进行处理。当过滤器处理成功后，把提交的数据发送到最终目标；如果过滤器处理不成功，将把视图派发到指定的错误页面。</p>
+<h3 id="2．Servlet过滤器开发步骤"><a href="#2．Servlet过滤器开发步骤" class="headerlink" title="2．Servlet过滤器开发步骤"></a>2．Servlet过滤器开发步骤</h3><p>开发Servlet过滤器的步骤如下：</p>
+<p>①编写实现Filter接口的Servlet类。</p>
+<p>②在web.xml中配置Filter。</p>
+<p>开发一个过滤器需要实现Filter接口，Filter接口定义了以下方法：</p>
+<p>①destory（）由Web容器调用，初始化此Filter。</p>
+<p>②init（FilterConfig filterConfig）由Web容器调用，初始化此Filter。</p>
+<p>③doFilter（ServletRequest request,ServletResponse response,FilterChain chain）具体过滤处理代码。</p>
+<h3 id="3．一个过滤器框架实例"><a href="#3．一个过滤器框架实例" class="headerlink" title="3．一个过滤器框架实例"></a>3．一个过滤器框架实例</h3><p>SimpleFilter1.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.zj.sample;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.Filter;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.FilterChain;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.FilterConfig;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletResponse;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleFilter1</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</span><br><span class="line">    <span class="keyword">private</span> FilterConfig filterConfig;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(FilterConfig config)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">       <span class="keyword">this</span>.filterConfig = config;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest request, ServletResponse response,</span></span></span><br><span class="line"><span class="function"><span class="params">           FilterChain chain)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           System.out.println(<span class="string">"Within SimpleFilter1:Filtering the Request..."</span>);</span><br><span class="line">           chain.doFilter(request, response);<span class="comment">// 把处理发送到下一个过滤器</span></span><br><span class="line">           System.out .println(<span class="string">"Within SimpleFilter1:Filtering the Response..."</span>);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException ioe) &#123;</span><br><span class="line">           ioe.printStackTrace();</span><br><span class="line">       &#125; <span class="keyword">catch</span> (ServletException se) &#123;</span><br><span class="line">           se.printStackTrace();</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="keyword">this</span>.filterConfig = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>SimpleFilter2.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.zj.sample;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.Filter;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.FilterChain;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.FilterConfig;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletResponse;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleFilter2</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</span><br><span class="line">    <span class="keyword">private</span> FilterConfig filterConfig;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(FilterConfig config)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">       <span class="keyword">this</span>.filterConfig = config;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest request, ServletResponse response,</span></span></span><br><span class="line"><span class="function"><span class="params">           FilterChain chain)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           System.out.println(<span class="string">"Within SimpleFilter2:Filtering the Request..."</span>);</span><br><span class="line">           chain.doFilter(request, response); <span class="comment">// 把处理发送到下一个过滤器</span></span><br><span class="line">           System.out.println(<span class="string">"Within SimpleFilter2:Filtering the Response..."</span>);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException ioe) &#123;</span><br><span class="line">           ioe.printStackTrace();</span><br><span class="line">       &#125; <span class="keyword">catch</span> (ServletException se) &#123;</span><br><span class="line">           se.printStackTrace();</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="keyword">this</span>.filterConfig = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>web.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>filter1<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-class</span>&gt;</span>com.zj.sample.SimpleFilter1<span class="tag">&lt;/<span class="name">filter-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">filter-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>filter1<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span>//为所有的访问做过滤</span><br><span class="line"><span class="tag">&lt;/<span class="name">filter-mapping</span>&gt;</span></span><br><span class="line"> </span><br><span class="line"><span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>filter2<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-class</span>&gt;</span>com.zj.sample.SimpleFilter2<span class="tag">&lt;/<span class="name">filter-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">filter-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>filter2<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span>//为所有的访问做过滤</span><br><span class="line"><span class="tag">&lt;/<span class="name">filter-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>打开web容器中任意页面输出结果：（注意过滤器执行的请求/响应顺序）</p>
+<p>Within SimpleFilter1:Filtering the Request…</p>
+<p>Within SimpleFilter2:Filtering the Request…</p>
+<p>Within SimpleFilter2:Filtering the Response…</p>
+<p>Within SimpleFilter1:Filtering the Response…</p>
+<h3 id="4．报告过滤器"><a href="#4．报告过滤器" class="headerlink" title="4．报告过滤器"></a>4．报告过滤器</h3><p>​    我们来试验一个简单的过滤器，只要调用相关的servlet或JSP页面，它就打印一条消息到标准输出。为实现此功能，在doFilter方法中执行过滤行为。每当调用与这个过滤器相关的servlet或JSP页面时，doFilter方法就生成一个打印输出，此输出列出请求主机和调用的URL。因为getRequestURL方法位于HttpServletRequest而不是ServletRequest中，所以把ServletRequest对象构造为HttpServletRequest类型。我们改动一下章节3的SimpleFilter1.java。</p>
+<p>SimpleFilter1.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.zj.sample;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.Filter;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.FilterChain;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.FilterConfig;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletResponse;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleFilter1</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</span><br><span class="line">    <span class="keyword">private</span> FilterConfig filterConfig;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(FilterConfig config)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">       <span class="keyword">this</span>.filterConfig = config;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest request, ServletResponse response,</span></span></span><br><span class="line"><span class="function"><span class="params">           FilterChain chain)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           System.out.println(<span class="string">"Within SimpleFilter1:Filtering the Request..."</span>);</span><br><span class="line">           HttpServletRequest req = (HttpServletRequest) request;</span><br><span class="line">           System.out.println(req.getRemoteHost() + <span class="string">" tried to access "</span></span><br><span class="line">                  + req.getRequestURL() + <span class="string">" on "</span> + <span class="keyword">new</span> Date() + <span class="string">"."</span>);</span><br><span class="line">           chain.doFilter(request, response);</span><br><span class="line">           System.out.println(<span class="string">"Within SimpleFilter1:Filtering the Response..."</span>);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException ioe) &#123;</span><br><span class="line">           ioe.printStackTrace();</span><br><span class="line">       &#125; <span class="keyword">catch</span> (ServletException se) &#123;</span><br><span class="line">           se.printStackTrace();</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="keyword">this</span>.filterConfig = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>web.xml设置不变，同章节3。</p>
+<p>测试：</p>
+<p>输入 <a href="http://localhost:8080/Test4Jsp/login.jsp" target="_blank" rel="noopener">http://localhost:8080/Test4Jsp/login.jsp</a></p>
+<p>结果：</p>
+<p>Within SimpleFilter1:Filtering the Request…</p>
+<p>0:0:0:0:0:0:0:1 tried to access  <a href="http://localhost:8080/Test4Jsp/login.jsp" target="_blank" rel="noopener">http://localhost:8080/Test4Jsp/login.jsp</a> on Sun Mar 04 17:01:37 CST 2007.</p>
+<p>Within SimpleFilter2:Filtering the Request…</p>
+<p>Within SimpleFilter2:Filtering the Response…</p>
+<p>Within SimpleFilter1:Filtering the Response…</p>
+<h3 id="5．访问时的过滤器（在过滤器中使用servlet初始化参数）"><a href="#5．访问时的过滤器（在过滤器中使用servlet初始化参数）" class="headerlink" title="5．访问时的过滤器（在过滤器中使用servlet初始化参数）"></a>5．访问时的过滤器（在过滤器中使用servlet初始化参数）</h3><p>下面利用init设定一个正常访问时间范围，对那些不在此时间段的访问作出记录。我们改动一下章节3的SimpleFilter2.java。</p>
+<p>SimpleFilter2.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.zj.sample;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.text.DateFormat;</span><br><span class="line"><span class="keyword">import</span> java.util.Calendar;</span><br><span class="line"><span class="keyword">import</span> java.util.GregorianCalendar;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.Filter;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.FilterChain;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.FilterConfig;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletContext;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletResponse;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleFilter2</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unused"</span>)</span><br><span class="line">    <span class="keyword">private</span> FilterConfig config;</span><br><span class="line">    <span class="keyword">private</span> ServletContext context;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> startTime, endTime;</span><br><span class="line">    <span class="keyword">private</span> DateFormat formatter;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(FilterConfig config)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">       <span class="keyword">this</span>.config = config;</span><br><span class="line">       context = config.getServletContext();</span><br><span class="line">       formatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,</span><br><span class="line">              DateFormat.MEDIUM);</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           startTime = Integer.parseInt(config.getInitParameter(<span class="string">"startTime"</span>));<span class="comment">// web.xml</span></span><br><span class="line">           endTime = Integer.parseInt(config.getInitParameter(<span class="string">"endTime"</span>));<span class="comment">// web.xml</span></span><br><span class="line">       &#125; <span class="keyword">catch</span> (NumberFormatException nfe) &#123; <span class="comment">// Malformed or null</span></span><br><span class="line">           <span class="comment">// Default: access at or after 10 p.m. but before 6 a.m. is</span></span><br><span class="line">           <span class="comment">// considered unusual.</span></span><br><span class="line">           startTime = <span class="number">22</span>; <span class="comment">// 10:00 p.m.</span></span><br><span class="line">           endTime = <span class="number">6</span>; <span class="comment">// 6:00 a.m.</span></span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest request, ServletResponse response,</span></span></span><br><span class="line"><span class="function"><span class="params">           FilterChain chain)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           System.out.println(<span class="string">"Within SimpleFilter2:Filtering the Request..."</span>);</span><br><span class="line">           HttpServletRequest req = (HttpServletRequest) request;</span><br><span class="line">           GregorianCalendar calendar = <span class="keyword">new</span> GregorianCalendar();</span><br><span class="line">           <span class="keyword">int</span> currentTime = calendar.get(Calendar.HOUR_OF_DAY);</span><br><span class="line">           <span class="keyword">if</span> (isUnusualTime(currentTime, startTime, endTime)) &#123;</span><br><span class="line">              context.log(<span class="string">"WARNING: "</span> + req.getRemoteHost() + <span class="string">" accessed "</span></span><br><span class="line">                     + req.getRequestURL() + <span class="string">" on "</span></span><br><span class="line">                     + formatter.format(calendar.getTime()));</span><br><span class="line">              <span class="comment">// The log file is under &lt;CATALINA_HOME&gt;/logs.One log per day.</span></span><br><span class="line">           &#125;</span><br><span class="line">           chain.doFilter(request, response);</span><br><span class="line">           System.out</span><br><span class="line">                  .println(<span class="string">"Within SimpleFilter2:Filtering the Response..."</span>);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException ioe) &#123;</span><br><span class="line">           ioe.printStackTrace();</span><br><span class="line">       &#125; <span class="keyword">catch</span> (ServletException se) &#123;</span><br><span class="line">           se.printStackTrace();</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Is the current time between the start and end</span></span><br><span class="line">    <span class="comment">// times that are marked as abnormal access times?</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">isUnusualTime</span><span class="params">(<span class="keyword">int</span> currentTime, <span class="keyword">int</span> startTime, <span class="keyword">int</span> endTime)</span> </span>&#123;</span><br><span class="line">       <span class="comment">// If the start time is less than the end time (i.e.,</span></span><br><span class="line">       <span class="comment">// they are two times on the same day), then the</span></span><br><span class="line">       <span class="comment">// current time is considered unusual if it is</span></span><br><span class="line">       <span class="comment">// between the start and end times.</span></span><br><span class="line">       <span class="keyword">if</span> (startTime &lt; endTime) &#123;</span><br><span class="line">           <span class="keyword">return</span> ((currentTime &gt;= startTime) &amp;&amp; (currentTime &lt; endTime));</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="comment">// If the start time is greater than or equal to the</span></span><br><span class="line">       <span class="comment">// end time (i.e., the start time is on one day and</span></span><br><span class="line">       <span class="comment">// the end time is on the next day), then the current</span></span><br><span class="line">       <span class="comment">// time is considered unusual if it is NOT between</span></span><br><span class="line">       <span class="comment">// the end and start times.</span></span><br><span class="line">       <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> (!isUnusualTime(currentTime, endTime, startTime));</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>web.xml设置不变。</p>
+<p>关于Tomcat日志处理，这里补充介绍一下。config.getServletContext().log（”log message”）会将日志信息写入&lt;CATALINA_HOME&gt;/logs文件夹下，文件名应该为localhost_log.2007-03-04.txt这样的形式（按日期每天产生一个，第二天可以看见）。要得到这样一个日志文件，应该在server.xml中有：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Logger</span> <span class="attr">className</span>=<span class="string">"org.apache.catalina.logger.FileLogger"</span> <span class="attr">prefix</span>=<span class="string">"catalina_log."</span> <span class="attr">suffix</span>=<span class="string">".txt"</span> <span class="attr">timestamp</span>=<span class="string">"true"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>参考资料</strong></p>
+<p>[1] Marty Halls ，Servlet与JSP权威指南，机械工业出版社</p>
+<p>[2] 赵强，精通JSP编程，电子工业出版社</p>
+<hr>
+<p>（转载自：<a href="http://blog.51cto.com/zhangjunhd/20629）" target="_blank" rel="noopener">http://blog.51cto.com/zhangjunhd/20629）</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Servlet/" rel="tag"># Servlet</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/05/Java-中-Comparable-和-Comparator-比较/" rel="next" title="Java 中 Comparable 和 Comparator 比较">
+                <i class="fa fa-chevron-left"></i> Java 中 Comparable 和 Comparator 比较
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/05/java-中int-String类型转换/" rel="prev" title="java 中int String类型转换">
+                java 中int String类型转换 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">loyal</p>
+              <p class="site-description motion-element" itemprop="description">苦逼的码农</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1．Servlet过滤器"><span class="nav-number">1.</span> <span class="nav-text">1．Servlet过滤器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-什么是过滤器"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 什么是过滤器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-Servlet过滤器的基本原理"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 Servlet过滤器的基本原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2．Servlet过滤器开发步骤"><span class="nav-number">2.</span> <span class="nav-text">2．Servlet过滤器开发步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3．一个过滤器框架实例"><span class="nav-number">3.</span> <span class="nav-text">3．一个过滤器框架实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4．报告过滤器"><span class="nav-number">4.</span> <span class="nav-text">4．报告过滤器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5．访问时的过滤器（在过滤器中使用servlet初始化参数）"><span class="nav-number">5.</span> <span class="nav-text">5．访问时的过滤器（在过滤器中使用servlet初始化参数）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">loyal</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
